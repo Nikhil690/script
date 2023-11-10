@@ -36,6 +36,10 @@ while true; do
 
     case "$answer" in
         yes)
+            sudo apt install -y zsh
+            sudo apt install -y curl wget git
+            sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
             echo "Installing Zsh"
             echo '' > ~/.zshrc
             echo "ZSH_THEME=\"avit\"" >> ~/.zshrc
