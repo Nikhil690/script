@@ -25,10 +25,15 @@ sudo apt install -y net-tools
 # Clean up downloaded Minikube package
 rm minikube_linux_amd64
 
-# Install go lang
+# Install lang
 sudo apt install -y golang clang llvm gcc-multilib libbpf-dev
+
+# Install required tools
+sudo apt install -y make
+
 echo "Installation completed successfully."cho "Installation completed successfully."
 
+#zsh installation
 
 while true; do
     echo "Do you want to continue zsh installation? (yes/no)"
@@ -50,8 +55,8 @@ while true; do
             sudo apt install command-not-found -y
 
             cd ~/.oh-my-zsh/plugins/
-            git clone https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_CUSTOM/plugins/zsh-autosuggestions
-            git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
+            sudo git clone https://github.com/zsh-users/zsh-autosuggestions.git ~/.oh-my-zsh/plugins/zsh-autosuggestions
+            sudo git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/plugins/zsh-syntax-highlighting
 
             source ~/.zshrc
             exec zsh
