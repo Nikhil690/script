@@ -1,6 +1,6 @@
 # commands
 ```
-curl -LO https://raw.githubusercontent.com/Nikhil690/script/main/ready.sh.sh
+curl -LO https://raw.githubusercontent.com/Nikhil690/script/main/ready.sh
 chmod +x ready.sh
 ./ready.sh
 ```
