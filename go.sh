@@ -15,6 +15,42 @@ else
     echo "Docker is already installed"
 fi
 
+while true; do
+    echo "Do you want to install Docker Compose plugin(p) / Docker compose standalone(s) or don't want it? (p/s/anykey)"
+    read answer
+
+    case "$answer" in
+        p)  if ! command docker compose &> /dev/null
+            then
+             # Install Docker Compose
+             DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
+             mkdir -p $DOCKER_CONFIG/cli-plugins
+             curl -SL https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
+            
+             chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
+            else
+             echo "Docker compose plugin is already installed"
+            fi
+
+            break
+            ;;
+        s) if ! command docker-compose &> /dev/null
+           then
+                sudo curl -SL https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+                sudo chmod +x /usr/local/bin/docker-compose
+           else
+                echo "Docker compose standalone is already installed"
+           fi
+
+            break
+            ;;
+
+        *)
+            echo "Skipping Docker Compose installation."
+            ;;
+    esac
+done
+
 # Install Minikube
 if ! command -v minikube &> /dev/null
 then
@@ -27,20 +63,20 @@ else
 fi
 
 # Install kubectl
-if ! command -v kubectl &> /dev/null
+if ! command -v kubectl
 then
-    sudo snap install -y kubectl --classic
+    sudo snap install kubectl --classic
 else
     echo "Kubernetes is already installed"
 fi
 
 # Install net-tools
-if ! command -v ifconfig &> dev/null
+if ! command -v ifconfig &> /dev/null
 then    
     sudo apt install -y net-tools
 else
     echo "net-tools already installed"
-
+fi
 
 # Install lang
 sudo apt install -y golang clang llvm gcc-multilib libbpf-dev
@@ -51,16 +87,16 @@ sudo apt install -y make
 # Install bpftool
 sudo apt install linux-tools-5.15.0-84-generic
 
-echo "Installation completed successfully."cho "Installation completed successfully."
+echo "Installation completed successfully."
 
 #zsh installation
 
 while true; do
-    echo "Do you want to continue zsh installation? (yes/no)"
+    echo "Do you want to continue zsh installation? (y/n)"
     read answer
 
     case "$answer" in
-        yes)
+        y)
             sudo apt install -y zsh
             sudo apt install -y curl wget git
             sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -83,7 +119,7 @@ while true; do
             cd
             break  # Exit the loop
             ;;
-        no)
+        n)
             echo "Aborted"
             break  # Exit the loop
             ;;
