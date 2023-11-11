@@ -116,11 +116,34 @@ while true; do
             sudo apt install command-not-found -y
 
             cd ~/.oh-my-zsh/plugins/
-            sudo git clone https://github.com/zsh-users/zsh-autosuggestions.git ~/.oh-my-zsh/plugins/zsh-autosuggestions
-            sudo git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/plugins/zsh-syntax-highlighting
+            
+             # Prompt user for plugin installation
+            echo "Which plugin(s) do you want to install? (syntax-highlighting(s)/both(b))"
+            read plugin_answer
+
+            case "$plugin_answer" in
+                s)
+                    echo "Installing zsh-syntax-highlighting"
+                    sudo apt install command-not-found -y
+                    [ ! -d ~/.oh-my-zsh/plugins/zsh-syntax-highlighting ] && sudo git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/plugins/zsh-syntax-highlighting
+                    ;;
+                
+                b)
+                    echo "Installing zsh-autosuggestions and zsh-syntax-highlighting"
+                    sudo apt install command-not-found -y
+                    [ ! -d ~/.oh-my-zsh/plugins/zsh-autosuggestions ] && sudo git clone https://github.com/zsh-users/zsh-autosuggestions.git ~/.oh-my-zsh/plugins/zsh-autosuggestions
+                    [ ! -d ~/.oh-my-zsh/plugins/zsh-syntax-highlighting ] && sudo git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/plugins/zsh-syntax-highlighting
+                    ;;
+                *)
+                    echo "Invalid choice. Please enter 'a' or 'b'."
+                    continue  # Restart the loop
+                    ;;
+            esac
+
+            echo "source $ZSH/oh-my-zsh.sh" >> ~/.zshrc
 
             source ~/.zshrc
-	    cd
+	        cd
             exec zsh
 
             break  # Exit the loop
