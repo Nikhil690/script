@@ -120,8 +120,9 @@ while true; do
             sudo git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/plugins/zsh-syntax-highlighting
 
             source ~/.zshrc
+	    cd
             exec zsh
-            cd
+
             break  # Exit the loop
             ;;
         n)
@@ -133,4 +134,4 @@ while true; do
             ;;
     esac
 done
-cd
+
