@@ -1,4 +1,4 @@
-# https://raw.githubusercontent.com/Nikhil690/script/main/go.sh
+# https://raw.githubusercontent.com/Nikhil690/script/main/ready.sh
 
 #!/bin/bash
 
