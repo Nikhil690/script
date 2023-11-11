@@ -1,6 +1,6 @@
 # commands
 ```
 curl -LO https://raw.githubusercontent.com/Nikhil690/script/main/go.sh
-chmod +x
+chmod +x go.sh
 ./go.sh
 ```
