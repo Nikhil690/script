@@ -15,46 +15,44 @@ else
     echo "Docker is already installed"
 fi
 
-if ! command -v docker compose && ! command -v docker-compose &> /dev/null
+if ! command -v "docker compose" || ! command -v "docker-compose" &> /dev/null
 then
+    while true; do
+        echo "Do you want to install Docker Compose plugin(p) / Docker compose standalone(s) or don't want it? (p/s/anykey)"
+        read answer
 
-while true; do
-    echo "Do you want to install Docker Compose plugin(p) / Docker compose standalone(s) or don't want it? (p/s/anykey)"
-    read answer
-
-    case "$answer" in
-        p)  if ! command docker compose &> /dev/null
-            then
-             # Install Docker Compose
-             DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
-             mkdir -p $DOCKER_CONFIG/cli-plugins
-             curl -SL https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
+        case "$answer" in
+            p)  if ! command docker compose &> /dev/null
+                then
+                # Install Docker Compose
+                DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
+                mkdir -p $DOCKER_CONFIG/cli-plugins
+                curl -SL https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
             
-             chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
-            else
-             echo "Docker compose plugin is already installed"
-            fi
+                chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
+                else
+                echo "Docker compose plugin is already installed"
+                fi
 
-            break
-            ;;
-        s) if ! command docker-compose &> /dev/null
-           then
-                sudo curl -SL https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
-                sudo chmod +x /usr/local/bin/docker-compose
-           else
-                echo "Docker compose standalone is already installed"
-           fi
+                break
+                ;;
+            s)  if ! command docker-compose &> /dev/null
+                then
+                    sudo curl -SL https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+                    sudo chmod +x /usr/local/bin/docker-compose
+                else
+                    echo "Docker compose standalone is already installed"
+                fi
 
-            break
-            ;;
+                break
+                ;;
 
-        *)
-            echo "Skipping Docker Compose installation."
-            break
-            ;;
-    esac
-done
-
+            *)
+                echo "Skipping Docker Compose installation."
+                break
+                ;;
+            esac
+    done
 else
     echo "docker compose is ready"
 fi
