@@ -15,6 +15,9 @@ else
     echo "Docker is already installed"
 fi
 
+if ! command -v docker compose && ! command -v docker-compose &> /dev/null
+then
+
 while true; do
     echo "Do you want to install Docker Compose plugin(p) / Docker compose standalone(s) or don't want it? (p/s/anykey)"
     read answer
@@ -47,10 +50,14 @@ while true; do
 
         *)
             echo "Skipping Docker Compose installation."
+            break
             ;;
     esac
 done
 
+else
+    echo "docker compose is ready"
+fi
 # Install Minikube
 if ! command -v minikube &> /dev/null
 then
