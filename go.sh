@@ -85,7 +85,7 @@ sudo apt install -y golang clang llvm gcc-multilib libbpf-dev
 sudo apt install -y make
 
 # Install bpftool
-sudo apt install linux-tools-5.15.0-84-generic
+sudo apt install  -y linux-tools-5.15.0-84-generic
 
 echo "Installation completed successfully."
 
