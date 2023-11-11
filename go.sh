@@ -3,33 +3,51 @@
 sudo apt update
 
 # Install Docker
-sudo apt install -y docker.io
-sudo usermod -aG docker $USER
-sudo chmod 666 /var/run/docker.sock
+if ! command -v docker &> /dev/null
+then
+    sudo apt install -y docker.io
+    sudo usermod -aG docker $USER
+    sudo chmod 666 /var/run/docker.sock
+    
+else
+    echo "Docker is already installed"
+fi
 
 # Install Minikube
-if ! command -v minikube
+if ! command -v minikube &> /dev/null
 then
 	curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
 	sudo install minikube-linux-amd64 /usr/local/bin/minikube
 else
 	echo "Minikube already installed"
+    # Clean up downloaded Minikube package
+    rm -rf minikube*
 fi
 
 # Install kubectl
-sudo snap install -y kubectl --classic
+if ! command -v kubectl &> /dev/null
+then
+    sudo snap install -y kubectl --classic
+else
+    echo "Kubernetes is already installed"
+fi
 
 # Install net-tools
-sudo apt install -y net-tools
+if ! command -v ifconfig &> dev/null
+then    
+    sudo apt install -y net-tools
+else
+    echo "net-tools already installed"
 
-# Clean up downloaded Minikube package
-rm minikube_linux_amd64
 
 # Install lang
 sudo apt install -y golang clang llvm gcc-multilib libbpf-dev
 
 # Install required tools
 sudo apt install -y make
+
+# Install bpftool
+sudo apt install linux-tools-5.15.0-84-generic
 
 echo "Installation completed successfully."cho "Installation completed successfully."
 
