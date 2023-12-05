@@ -1,3 +1,4 @@
+#https://raw.githubusercontent.com/Nikhil690/script/main/NFs.sh
 #!/bin/bash
 
 sudo apt update
