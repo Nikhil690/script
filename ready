@@ -139,38 +139,76 @@ install_bpftool() {
 
 
 # Function to install Zsh
+# Function to install Zsh
 install_zsh() {
     update_package_manager
     if ! command -v zsh &> /dev/null; then
-        sudo apt install -y zsh || handle_error "Failed to install Zsh"
-        print_confirmation "Zsh installation"
-        
-        # Configure Zsh
-        if ! grep -q "ZSH_THEME=\"avit\"" ~/.zshrc; then
-            echo '' >~/.zshrc
-            echo "ZSH_THEME=\"avit\"" >>~/.zshrc
-            echo "DEFAULT_USER=$USER" >>~/.zshrc
-            echo "plugins=(git zsh-autosuggestions zsh-syntax-highlighting)" >>~/.zshrc
-            echo "source \$ZSH/oh-my-zsh.sh" >>~/.zshrc
-            print_confirmation "Zsh configuration"
-        else
-            echo "Zsh is already configured"
-        fi
-        
-        if [ ! -d ~/.oh-my-zsh/plugins/zsh-syntax-highlighting ]; then
-            sudo git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/plugins/zsh-syntax-highlighting || handle_error "Failed to clone zsh-syntax-highlighting"
-        fi
+        while true; do
+            echo "Do you want to continue zsh installation? (y/n)"
+            read answer
 
-        if [ ! -d ~/.oh-my-zsh/plugins/zsh-autosuggestions ]; then
-            sudo git clone https://github.com/zsh-users/zsh-autosuggestions.git ~/.oh-my-zsh/plugins/zsh-autosuggestions || handle_error "Failed to clone zsh-autosuggestions"
-        fi
+            case "$answer" in
+                y)
+                    sudo apt install -y zsh || handle_error "Failed to install Zsh"
+                    sudo apt install -y curl wget git || handle_error "Failed to install required packages"
+                    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || handle_error "Failed to install Oh My Zsh"
 
-        print_confirmation "Zsh plugins installation"
-        exec zsh
+                    echo "Installing Zsh"
+                    echo '' > ~/.zshrc
+                    echo "ZSH_THEME=\"avit\"" >> ~/.zshrc
+                    echo "DEFAULT_USER=$USER" >> ~/.zshrc
+                    echo "plugins=(git zsh-autosuggestions zsh-syntax-highlighting)" >> ~/.zshrc
+                    echo "source \$ZSH/oh-my-zsh.sh" >> ~/.zshrc
+
+                    sudo apt install command-not-found -y || handle_error "Failed to install command-not-found"
+
+                    cd ~/.oh-my-zsh/plugins/
+                    
+                    # Prompt user for plugin installation
+                    echo "Which plugin(s) do you want to install? (syntax-highlighting(s)/both(b))"
+                    read plugin_answer
+
+                    case "$plugin_answer" in
+                        s)
+                            echo "Installing zsh-syntax-highlighting"
+                            sudo apt install command-not-found -y || handle_error "Failed to install command-not-found"
+                            [ ! -d ~/.oh-my-zsh/plugins/zsh-syntax-highlighting ] && sudo git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/plugins/zsh-syntax-highlighting
+                            ;;
+                        
+                        b)
+                            echo "Installing zsh-autosuggestions and zsh-syntax-highlighting"
+                            sudo apt install command-not-found -y || handle_error "Failed to install command-not-found"
+                            [ ! -d ~/.oh-my-zsh/plugins/zsh-autosuggestions ] && sudo git clone https://github.com/zsh-users/zsh-autosuggestions.git ~/.oh-my-zsh/plugins/zsh-autosuggestions
+                            [ ! -d ~/.oh-my-zsh/plugins/zsh-syntax-highlighting ] && sudo git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/plugins/zsh-syntax-highlighting
+                            ;;
+                        *)
+                            echo "Invalid choice. Please enter 's' or 'b'."
+                            continue  # Restart the loop
+                            ;;
+                    esac
+
+                    echo "source \$ZSH/oh-my-zsh.sh" >> ~/.zshrc
+
+                    source ~/.zshrc
+                    cd
+                    exec zsh
+
+                    break  # Exit the loop
+                    ;;
+                n)
+                    echo "Aborted"
+                    break  # Exit the loop
+                    ;;
+                *)
+                    echo "Invalid input. Please enter 'y' or 'n'."
+                    ;;
+            esac
+        done
     else
         echo "Zsh is already installed"
     fi
 }
+
 
 # Function to display help message
 display_help() {
