@@ -1,10 +1,10 @@
 # commands
 ```
-curl -LO https://raw.githubusercontent.com/Nikhil690/script/main/ready.sh
-chmod +x ready.sh
-./ready.sh
+curl -LO https://raw.githubusercontent.com/Nikhil690/script/main/ready
+chmod +x ready
+./ready
 ```
 ## after zsh installation run this
 ```
-zsh ready.sh
+zsh ready
 ```
