@@ -189,7 +189,6 @@
 
                 source ~/.zshrc
                 cd
-                exec zsh
 
                 break  # Exit the loop
                 ;;
