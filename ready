@@ -156,7 +156,7 @@
                 echo "ZSH_THEME=\"avit\"" >> ~/.zshrc
                 echo "DEFAULT_USER=$USER" >> ~/.zshrc
                 echo "plugins=(git zsh-autosuggestions zsh-syntax-highlighting)" >> ~/.zshrc
-                echo "source $ZSH/oh-my-zsh.sh" >> ~/.zshrc
+                # echo "source $ZSH/oh-my-zsh.sh" >> ~/.zshrc this is creating error 
 
                 sudo apt install command-not-found -y
 
