@@ -122,6 +122,7 @@ install_programming_languages() {
 install_required_tools() {
     update_package_manager
     sudo apt install -y make || handle_error "Failed to install make"
+    sudo snap install cmake --classic || handle_error "Failed to install cmake"
     print_confirmation "make installation"
 }
 
