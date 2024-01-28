@@ -247,9 +247,6 @@
     done
     shift $((OPTIND -1))
 
-    # Display help message if no flags are provided
-    if [[ $# -eq 0 ]]; then
-        display_help
-    fi
+
 
     echo "All installations completed successfully."
