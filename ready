@@ -1,160 +1,141 @@
-# https://raw.githubusercontent.com/Nikhil690/script/main/ready
-
 #!/bin/bash
 
-sudo apt update
+# Function for error handling
+handle_error() {
+    echo "Error: $1"
+    exit 1
+}
+
+# Function for printing confirmation messages
+print_confirmation() {
+    echo "$1 completed successfully."
+}
+
+# Ensure consistent indentation
+set -e
+trap 'handle_error "An error occurred"' ERR
+
+# Update package manager
+sudo apt update || handle_error "Failed to update package manager"
 
 # Install Docker
-if ! command -v docker &> /dev/null
-then
-    sudo apt install -y docker.io
-    sudo usermod -aG docker $USER
-    sudo chmod 666 /var/run/docker.sock
-    
+if ! command -v docker &> /dev/null; then
+    sudo apt install -y docker.io || handle_error "Failed to install Docker"
+    sudo usermod -aG docker $USER || handle_error "Failed to add user to Docker group"
+    sudo chmod 666 /var/run/docker.sock || handle_error "Failed to set permissions for Docker socket"
+    print_confirmation "Docker installation"
 else
     echo "Docker is already installed"
 fi
 
-if ! command -v "docker compose" || ! command -v "docker-compose" &> /dev/null
-then
+# Install Docker Compose
+if ! command -v "docker compose" &> /dev/null; then
     while true; do
-        echo "Do you want to install Docker Compose plugin(p) / Docker compose standalone(s) or don't want it? (p/s/anykey)"
+        echo "Do you want to install Docker Compose plugin(p) / Docker compose standalone(s) or skip it? (p/s/any key)"
         read answer
 
         case "$answer" in
-            p)  if ! command docker compose &> /dev/null
-                then
-                # Install Docker Compose
+        p)
+            if ! command docker compose &> /dev/null; then
                 DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
                 mkdir -p $DOCKER_CONFIG/cli-plugins
-                curl -SL https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
-            
-                chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
-                else
-                echo "Docker compose plugin is already installed"
-                fi
-
-                break
-                ;;
-            s)  if ! command docker-compose &> /dev/null
-                then
-                    sudo curl -SL https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
-                    sudo chmod +x /usr/local/bin/docker-compose
-                else
-                    echo "Docker compose standalone is already installed"
-                fi
-
-                break
-                ;;
-
-            *)
-                echo "Skipping Docker Compose installation."
-                break
-                ;;
-            esac
+                curl -SL https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose || handle_error "Failed to download Docker Compose plugin"
+                chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose || handle_error "Failed to set execute permission for Docker Compose plugin"
+            else
+                echo "Docker Compose plugin is already installed"
+            fi
+            print_confirmation "Docker Compose plugin installation"
+            break
+            ;;
+        s)
+            if ! command docker-compose &> /dev/null; then
+                sudo curl -SL https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose || handle_error "Failed to download Docker Compose standalone"
+                sudo chmod +x /usr/local/bin/docker-compose || handle_error "Failed to set execute permission for Docker Compose standalone"
+            else
+                echo "Docker Compose standalone is already installed"
+            fi
+            print_confirmation "Docker Compose standalone installation"
+            break
+            ;;
+        *)
+            echo "Skipping Docker Compose installation."
+            break
+            ;;
+        esac
     done
 else
-    echo "docker compose is ready"
+    echo "Docker Compose is already installed"
 fi
+
 # Install Minikube
-if ! command -v minikube &> /dev/null
-then
-	curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-	sudo install minikube-linux-amd64 /usr/local/bin/minikube
+if ! command -v minikube &> /dev/null; then
+    curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 || handle_error "Failed to download Minikube"
+    sudo install minikube-linux-amd64 /usr/local/bin/minikube || handle_error "Failed to install Minikube"
+    rm -rf minikube* || handle_error "Failed to clean up Minikube installation files"
+    print_confirmation "Minikube installation"
 else
-	echo "Minikube already installed"
-    # Clean up downloaded Minikube package
-    rm -rf minikube*
+    echo "Minikube is already installed"
 fi
 
 # Install kubectl
-if ! command -v kubectl
-then
-    sudo snap install kubectl --classic
+if ! command -v kubectl &> /dev/null; then
+    sudo snap install kubectl --classic || handle_error "Failed to install kubectl"
+    print_confirmation "kubectl installation"
 else
-    echo "Kubernetes is already installed"
+    echo "kubectl is already installed"
 fi
 
 # Install net-tools
-if ! command -v ifconfig &> /dev/null
-then    
-    sudo apt install -y net-tools
+if ! command -v ifconfig &> /dev/null; then
+    sudo apt install -y net-tools || handle_error "Failed to install net-tools"
+    print_confirmation "net-tools installation"
 else
-    echo "net-tools already installed"
+    echo "net-tools is already installed"
 fi
 
-# Install lang
-sudo apt install -y golang clang llvm gcc-multilib libbpf-dev
+# Install programming languages and tools
+sudo apt install -y golang clang llvm gcc-multilib libbpf-dev || handle_error "Failed to install programming languages and tools"
+print_confirmation "Programming languages and tools installation"
 
 # Install required tools
-sudo apt install -y make
+sudo apt install -y make || handle_error "Failed to install make"
+print_confirmation "make installation"
 
 # Install bpftool
-sudo apt install  -y linux-tools-5.15.0-84-generic
+sudo apt install -y linux-tools-5.15.0-84-generic || handle_error "Failed to install bpftool"
+print_confirmation "bpftool installation"
 
-echo "Installation completed successfully."
+# Install Zsh
+if ! command -v zsh &> /dev/null; then
+    sudo apt install -y zsh || handle_error "Failed to install Zsh"
+    sudo apt install -y curl wget git || handle_error "Failed to install curl, wget, git"
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || handle_error "Failed to install Oh My Zsh"
+    print_confirmation "Zsh installation"
+else
+    echo "Zsh is already installed"
+fi
 
-#zsh installation
+# Configure Zsh
+if ! grep -q "ZSH_THEME=\"avit\"" ~/.zshrc; then
+    echo '' >~/.zshrc
+    echo "ZSH_THEME=\"avit\"" >>~/.zshrc
+    echo "DEFAULT_USER=$USER" >>~/.zshrc
+    echo "plugins=(git zsh-autosuggestions zsh-syntax-highlighting)" >>~/.zshrc
+    echo "source \$ZSH/oh-my-zsh.sh" >>~/.zshrc
+    print_confirmation "Zsh configuration"
+else
+    echo "Zsh is already configured"
+fi
 
-while true; do
-    echo "Do you want to continue zsh installation? (y/n)"
-    read answer
+# Install Zsh plugins
+if [ ! -d ~/.oh-my-zsh/plugins/zsh-syntax-highlighting ]; then
+    sudo git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/plugins/zsh-syntax-highlighting || handle_error "Failed to clone zsh-syntax-highlighting"
+fi
 
-    case "$answer" in
-        y)
-            sudo apt install -y zsh
-            sudo apt install -y curl wget git
-            sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+if [ ! -d ~/.oh-my-zsh/plugins/zsh-autosuggestions ]; then
+    sudo git clone https://github.com/zsh-users/zsh-autosuggestions.git ~/.oh-my-zsh/plugins/zsh-autosuggestions || handle_error "Failed to clone zsh-autosuggestions"
+fi
 
-            echo "Installing Zsh"
-            echo '' > ~/.zshrc
-            echo "ZSH_THEME=\"avit\"" >> ~/.zshrc
-            echo "DEFAULT_USER=$USER" >> ~/.zshrc
-            echo "plugins=(git zsh-autosuggestions zsh-syntax-highlighting)" >> ~/.zshrc
-            echo "source $ZSH/oh-my-zsh.sh" >> ~/.zshrc
+print_confirmation "Zsh plugins installation"
 
-            sudo apt install command-not-found -y
-
-            cd ~/.oh-my-zsh/plugins/
-            
-             # Prompt user for plugin installation
-            echo "Which plugin(s) do you want to install? (syntax-highlighting(s)/both(b))"
-            read plugin_answer
-
-            case "$plugin_answer" in
-                s)
-                    echo "Installing zsh-syntax-highlighting"
-                    sudo apt install command-not-found -y
-                    [ ! -d ~/.oh-my-zsh/plugins/zsh-syntax-highlighting ] && sudo git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/plugins/zsh-syntax-highlighting
-                    ;;
-                
-                b)
-                    echo "Installing zsh-autosuggestions and zsh-syntax-highlighting"
-                    sudo apt install command-not-found -y
-                    [ ! -d ~/.oh-my-zsh/plugins/zsh-autosuggestions ] && sudo git clone https://github.com/zsh-users/zsh-autosuggestions.git ~/.oh-my-zsh/plugins/zsh-autosuggestions
-                    [ ! -d ~/.oh-my-zsh/plugins/zsh-syntax-highlighting ] && sudo git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/plugins/zsh-syntax-highlighting
-                    ;;
-                *)
-                    echo "Invalid choice. Please enter 'a' or 'b'."
-                    continue  # Restart the loop
-                    ;;
-            esac
-
-            echo "source $ZSH/oh-my-zsh.sh" >> ~/.zshrc
-
-            source ~/.zshrc
-	        cd
-            exec zsh
-
-            break  # Exit the loop
-            ;;
-        n)
-            echo "Aborted"
-            break  # Exit the loop
-            ;;
-        *)
-            echo "Are you dumb! enter 'yes' or 'no'."
-            ;;
-    esac
-done
-
+echo "All installations completed successfully."
